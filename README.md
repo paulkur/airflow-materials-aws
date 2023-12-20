@@ -353,19 +353,19 @@ watch kubectl get pods -n dev
 - enter pod
 
 ```bash
-kubectl exec -it airflow-dev-scheduler-6c4fcf77bf-87ppf -n dev -c scheduler -- /bin/bash
-```
-
-- delete all pods
-
-```bash
-kubectl delete pods --all --force --grace-period=0 -n dev
+kubectl exec -it airflow-dev-scheduler-6bf9b46568-xrhgq -n dev -c scheduler -- /bin/bash
 ```
 
 - list dags
 
 ```bash
 airflow dags list
+```
+
+- delete all pods
+
+```bash
+kubectl delete pods --all --force --grace-period=0 -n dev
 ```
 
 ### Flux commands
