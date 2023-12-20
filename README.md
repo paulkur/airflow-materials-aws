@@ -8,6 +8,7 @@ Materials for the next course
 - [4.20 Creating and configuring the Git repository for GitOps](#Creating-and-configuring-the-Git-repository-for-GitOps)
 - [4.22 Creating the Cluster with eksctl](#Creating-the-Cluster-with-eksctl)
 - [4.23 Installing and Configuring Flux](#Installing-and-Configuring-Flux)
+- [5.30 Installing the EBS Driver](#Installing-the-EBS-Driver)
 
 ### Configuring the workstation
 
@@ -90,7 +91,7 @@ helm version --short
 helm repo add stable https://charts.helm.sh/stable
 ```
 
-- Config git (change the name by airflow-workstation and keep the email. Save and exit the file.))
+- Config git (change the name by airflow-workstation and keep the email. Save and exit the file.)
 
 ```bash
 git config --global user.name "airflow-workstation"
@@ -318,9 +319,63 @@ git commit -am "add a new namespaces"
 git push
 ```
 
-
 - check namespaces
 
 ```bash
 kubectl get namespaces
+```
+
+### Installing the EBS Driver
+
+- oficial [git repo here](https://github.com/kubernetes-sigs/aws-ebs-csi-driver), [installation here](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/docs/install.md)
+- commands to run
+
+```bash
+cd airflow-eks-config
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo update
+```
+
+```bash
+helm upgrade --install aws-ebs-csi-driver \
+    --namespace kube-system \
+    aws-ebs-csi-driver/aws-ebs-csi-driver
+```
+
+## kubectl commands
+
+- check pods
+
+```bash
+watch kubectl get pods -n dev
+```
+
+- enter pod
+
+```bash
+kubectl exec -it airflow-dev-scheduler-6c4fcf77bf-87ppf -n dev -c scheduler -- /bin/bash
+```
+
+- delete all pods
+
+```bash
+kubectl delete pods --all --force --grace-period=0 -n dev
+```
+
+- list dags
+
+```bash
+airflow dags list
+```
+
+### Flux commands
+
+```bash
+flux get all
+```
+
+- filter error messages
+
+```bash
+flux logs --follow --level=error --all-namespaces
 ```
