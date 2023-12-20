@@ -3,9 +3,12 @@ Materials for the next course
 
 ## Links
 
-- [Workflow](#Update-packages-of-the-instance)
+- [4.16 Configuring the workstation](#Configuring-the-workstation)
+- [4.17 Configuring Cloud9 with the Admin account](#Configuring-Cloud9-with-the-Admin-account)
+- [4.20 Creating and configuring the Git repository for GitOps](#Creating-and-configuring-the-Git-repository-for-GitOps)
+- [4.22 Creating the Cluster with eksctl](#Creating-the-Cluster-with-eksctl)
 
-### Step 1
+### Configuring the workstation
 
 - Update packages of the instance
 
@@ -16,7 +19,7 @@ sudo yum -y update
 - Create a python virtual environment
 
 ```bash
-python -m venv .sandbox
+python3 -m venv .sandbox
 ```
 
 - Active the python virtual environment
@@ -86,69 +89,143 @@ helm version --short
 helm repo add stable https://charts.helm.sh/stable
 ```
 
-# Config git
+- Config git (change the name by airflow-workstation and keep the email. Save and exit the file.))
+
+```bash
 git config --global user.name "airflow-workstation"
-# change the name by airflow-workstation and keep the email. Save and exit the file.
+```
 
-################################# EOV
+### Configuring Cloud9 with the Admin account
 
-# upgrade aws cli
+- upgrade aws cli
+
+```bash
 pip install --upgrade awscli && hash -r
+```
 
-# install some utilities
+- install some utilities
+
+```bash
 sudo yum -y install jq gettext bash-completion moreutils
+```
 
-# go the settings, AWS settings and turn off temporary credentials
+- go the settings, AWS settings and turn off temporary credentials
 
-# remove temporary credentials
+- remove temporary credentials
+
+```bash
 rm -vf ${HOME}/.aws/credentials
+```
 
-# configure aws env variables
-# The following get-caller-identity example displays information about the IAM identity used to authenticate the request
+- configure aws env variables
+- The following get-caller-identity example displays information about the IAM identity used to authenticate the request
+
+```bash
 aws configure
-aws sts get-caller-identity
-export ACCOUNT_ID=
-export AWS_REGION=
+```
 
-# update the file bash_profile and configure aws
+```bash
+aws sts get-caller-identity
+```
+
+```bash
+export ACCOUNT_ID=
+```
+
+```bash
+export AWS_REGION=
+```
+
+- update the file bash_profile and configure aws
+
+```bash
 echo "export ACCOUNT_ID=${ACCOUNT_ID}" | tee -a ~/.bash_profile
 echo "export AWS_REGION=${AWS_REGION}" | tee -a ~/.bash_profile
+```
+
+```bash
 aws configure set default.region ${AWS_REGION}
 aws configure get default.region
+```
 
-################################# EOV
+### Creating and configuring the Git repository for GitOps
 
-# Press return for all questions by keeping the defaults and empty passphrase.
+- Press return for all questions by keeping the defaults and empty passphrase.
+
+```bash
 ssh-keygen -t rsa
+```
 
-################################# EOV
+- copy public key to github ssh keys
 
+```bash
+cat /home/ec2-user/.ssh/id_rsa.pub
+```
+
+### Creating the Cluster with eksctl
+
+```bash
 cd airflow-materials-aws
+```
 
-# Install the key
+- Install the key
+
+```bash
 aws ec2 import-key-pair --key-name "airflow-workstation" --public-key-material fileb:///home/ec2-user/.ssh/id_rsa.pub
+```
 
-# Install aws-iam-authenticator
-# Othwerise, doesn't look for the token and kubectl can't connect
+- Install the key (pennvet)
+
+```bash
+aws ec2 import-key-pair --key-name "airflow-workstation-pennvet" --public-key-material fileb:///home/ec2-user/.ssh/id_rsa.pub
+```
+
+- Install aws-iam-authenticator
+- Othwerise, doesn't look for the token and kubectl can't connect
+
+```bash
 curl -Lo aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_amd64
 chmod +x ./aws-iam-authenticator
+```
+
+```bash
 mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$PATH:$HOME/bin
 echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc
 aws-iam-authenticator help
+```
 
-# Install AWS V2
+- Install AWS V2
+
+```bash
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+```
+
+```bash
 unzip awscliv2.zip
 sudo ./aws/install --update
+```
 
-# Create the cluster
+```bash
+aws --version
+```
+
+```bash
+cd airflow-materials-aws
+```
+
+- Create the cluster
+
+```bash
 eksctl create cluster -f cluster.yml
+```
 
-# Check if the cluster is healthy
+- Check if the cluster is healthy
+
+```bash
 kubectl get nodes
 kubectl get pods --all-namespaces
 
-################################# EOV
+###
 
 curl -s https://fluxcd.io/install.sh | sudo bash
 
