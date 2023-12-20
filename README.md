@@ -7,6 +7,7 @@ Materials for the next course
 - [4.17 Configuring Cloud9 with the Admin account](#Configuring-Cloud9-with-the-Admin-account)
 - [4.20 Creating and configuring the Git repository for GitOps](#Creating-and-configuring-the-Git-repository-for-GitOps)
 - [4.22 Creating the Cluster with eksctl](#Creating-the-Cluster-with-eksctl)
+- [4.23 Installing and Configuring Flux](#Installing-and-Configuring-Flux)
 
 ### Configuring the workstation
 
@@ -180,6 +181,12 @@ aws ec2 import-key-pair --key-name "airflow-workstation" --public-key-material f
 aws ec2 import-key-pair --key-name "airflow-workstation-pennvet" --public-key-material fileb:///home/ec2-user/.ssh/id_rsa.pub
 ```
 
+- Install the key (johnvirtuon)
+
+```bash
+aws ec2 import-key-pair --key-name "airflow-workstation-john" --public-key-material fileb:///home/ec2-user/.ssh/id_rsa.pub
+```
+
 - Install aws-iam-authenticator
 - Othwerise, doesn't look for the token and kubectl can't connect
 
@@ -223,22 +230,65 @@ eksctl create cluster -f cluster.yml
 
 ```bash
 kubectl get nodes
+```
+
+```bash
 kubectl get pods --all-namespaces
+```
 
-###
+### Installing and Configuring Flux
 
+```bash
 curl -s https://fluxcd.io/install.sh | sudo bash
+```
 
+```bash
+flux --version
+```
+
+```bash
+export GITHUB_TOKEN=<your_token_from_github>
+```
+
+```bash
+echo $GITHUB_TOKEN
+```
+
+```bash
 flux bootstrap github \
-  --owner=marclamberti \
+  --owner=paulkur \
   --repository=airflow-eks-config \
   --branch=main \
   --interval=15s \
   --personal
+```
 
+```bash
 mkdir airflow-eks-config/{workloads,releases,namespaces}
+```
+
+```bash
 find airflow-eks-config/ -type d -exec touch {}/.keep \;
+```
+
+```bash
 cd airflow-eks-config
 git add .
 git commit -am "directory structure"
 git push
+```
+
+- after adding namespaces
+
+```bash
+cd airflow-eks-config
+git add .
+git commit -am "add a new namespaces"
+git push
+```
+
+- check namespaces
+
+```bash
+kubectl get namespaces
+```
