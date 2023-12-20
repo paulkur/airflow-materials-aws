@@ -265,9 +265,6 @@ flux bootstrap github \
 
 ```bash
 mkdir airflow-eks-config/{workloads,releases,namespaces}
-```
-
-```bash
 find airflow-eks-config/ -type d -exec touch {}/.keep \;
 ```
 
@@ -286,6 +283,41 @@ git add .
 git commit -am "add a new namespaces"
 git push
 ```
+
+################## Other account
+
+- for personal aws johnvirtuon account
+
+```bash
+flux bootstrap github \
+  --owner=paulkur \
+  --repository=airflow-eks-config-john \
+  --branch=main \
+  --interval=15s \
+  --personal
+```
+
+```bash
+mkdir airflow-eks-config-john/{workloads,releases,namespaces}
+find airflow-eks-config-john/ -type d -exec touch {}/.keep \;
+```
+
+```bash
+cd airflow-eks-config-john
+git add .
+git commit -am "directory structure"
+git push
+```
+
+- after adding namespaces
+
+```bash
+cd airflow-eks-config-john
+git add .
+git commit -am "add a new namespaces"
+git push
+```
+
 
 - check namespaces
 
